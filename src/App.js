@@ -1,25 +1,39 @@
-import logo from './logo.svg';
+import ProductForm from './Components/ProductForm';
+import ListProducts from './Components/ListProducts';
+import { toast } from 'react-toastify';
+import { db } from './firebase';
+
+import 'antd/dist/antd.css';
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+    const onCreateProduct = async ({ title, description, images: { fileList } }) => {
+        console.log(title, description, fileList);
+        await db.collection('products').doc().set({ 
+            title,
+            description,
+            images: fileList.map(({ name, thumbUrl }) => ({ name, url: thumbUrl }))
+        });
+        toast('You created a product!', {
+            type: 'success'
+        });
+    }
+
+    return (
+        <div className="App">
+            <div id="wrapProducts">
+                <div className="wrapProductForm">
+                    <h1>Create Product</h1>
+                    <ProductForm onSubmit={onCreateProduct} />
+                </div>
+                <h1>Products</h1>
+                <div className="listProducts">
+                    <ListProducts />
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default App;
